@@ -22,6 +22,30 @@
   var now = new Date().getFullYear();
   document.querySelectorAll("[data-year]").forEach(function (el) { el.textContent = now; });
 
+  /* mini-rekenhulp: vele kleintjes per jaar */
+  var calc = document.getElementById("kleintjes-calc");
+  if (calc) {
+    var amt = calc.querySelector("[data-calc-amount]");
+    var freq = calc.querySelector("[data-calc-freq]");
+    var outY = calc.querySelector("[data-calc-year]");
+    var outM = calc.querySelector("[data-calc-month]");
+    var outD = calc.querySelector("[data-calc-decade]");
+    var euro = function (v) {
+      if (!isFinite(v) || v < 0) v = 0;
+      return "€ " + Math.round(v).toLocaleString("nl-BE");
+    };
+    var update = function () {
+      var a = parseFloat(String(amt.value).replace(",", ".")) || 0;
+      var perYear = a * (parseFloat(freq.value) || 0);
+      outY.textContent = euro(perYear);
+      if (outM) outM.textContent = euro(perYear / 12);
+      if (outD) outD.textContent = euro(perYear * 10);
+    };
+    amt.addEventListener("input", update);
+    freq.addEventListener("change", update);
+    update();
+  }
+
   /* actieve sectie markeren in inhoudsopgave (indien aanwezig) */
   var tocLinks = document.querySelectorAll(".toc a[href^='#']");
   if (tocLinks.length && "IntersectionObserver" in window) {

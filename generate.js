@@ -170,7 +170,7 @@ function brandMark() {
 const NAV = [
   ["index.html", "Home"],
   ["aanpak.html", "Het stappenplan"],
-  ["gidsen.html", "Waarop besparen?"],
+  ["gidsen.html", "Spaargidsen"],
   ["rechten-premies.html", "Rechten &amp; premies"],
   ["over.html", "Over"],
 ];
@@ -195,7 +195,7 @@ function footer() {
     '<div class="foot-grid">' +
       '<div><a class="brand" href="index.html">' + brandMark() + '<span class="brand-copy"><span class="brand-title">Centiem</span></span></a>' +
         '<p style="margin-top:.8rem;max-width:34ch;color:#9fc0bd">Onafhankelijk Vlaams platform dat helpt om bewuster met geld om te gaan en te besparen. Geen verkoop van financiële producten.</p></div>' +
-      '<div><h4>Waarop besparen?</h4><ul>' +
+      '<div><h4>Spaargidsen</h4><ul>' +
         '<li><a href="boodschappen.html">Boodschappen</a></li>' +
         '<li><a href="abonnementen.html">Abonnementen</a></li>' +
         '<li><a href="energie-water.html">Energie &amp; water</a></li>' +
@@ -237,8 +237,8 @@ function page(opts) {
     footer() +
     '\n<script src="assets/app.js"></script>\n</body>\n</html>\n';
 }
-function pagehead(crumbLabel, h1, intro) {
-  return '<div class="pagehead"><div class="wrap">' +
+function pagehead(crumbLabel, h1, intro, bg) {
+  return '<div class="pagehead header-bg-' + (bg || 'guides') + '"><div class="wrap">' +
     '<nav class="crumbs" aria-label="kruimelpad"><a href="index.html">Home</a><span>›</span>' + crumbLabel + '</nav>' +
     '<h1>' + h1 + '</h1><p>' + intro + '</p>' +
   '</div></div>';
@@ -251,7 +251,7 @@ function add(file, title, active, body, desc) { PAGES.push({ file: file, html: p
    HOME
    ============================================================ */
 add("index.html", "Slim met geld, voor iedereen", "index.html", '' +
-  '<section class="hero"><div class="wrap"><div class="hero-grid">' +
+  '<section class="hero header-bg-home"><div class="wrap"><div class="hero-grid">' +
     '<div>' +
       '<p class="eyebrow">Onafhankelijk &middot; gratis &middot; Vlaams</p>' +
       '<h1>Grip op je <span class="hl">geld</span>, stap voor stap</h1>' +
@@ -262,7 +262,6 @@ add("index.html", "Slim met geld, voor iedereen", "index.html", '' +
         '<a class="btn btn-amber" href="hulp-nodig.html">Ik heb nu hulp nodig</a>' +
       '</div>' +
     '</div>' +
-    '<div class="hero-visual">' + heroArt() + '</div>' +
   '</div></div></section>' +
 
   '<section><div class="wrap">' +
@@ -286,7 +285,7 @@ add("index.html", "Slim met geld, voor iedereen", "index.html", '' +
   '</div></section>' +
 
   '<section id="gidsen"><div class="wrap">' +
-    '<p class="eyebrow">Waarop besparen?</p>' +
+    '<p class="eyebrow">Spaargidsen</p>' +
     '<h2>Waar wil je op besparen?</h2>' +
     '<div class="grid cols-3" style="margin-top:1.2rem">' +
       gcard("🛒", "Boodschappen", "Huismerken, slimmer winkelen, minder weggooien.", "boodschappen.html") +
@@ -317,8 +316,30 @@ add("index.html", "Slim met geld, voor iedereen", "index.html", '' +
   '</div></div></section>'
 );
 function gcard(ic, title, txt, href) {
-  return '<a class="card link-card" href="' + href + '"><div class="ic">' + ic + '</div>' +
-    '<h3>' + title + '</h3><p>' + txt + '</p><span class="more">Bekijk gids ' + svgIcon("arrowright") + '</span></a>';
+  return '<a class="card link-card" href="' + href + '">' +
+    '<div class="card-head"><div class="ic">' + ic + '</div>' +
+    '<div class="card-body"><h3>' + title + '</h3><p>' + txt + '</p></div></div>' +
+    '<span class="more">Bekijk gids ' + svgIcon("arrowright") + '</span></a>';
+}
+function calculator() {
+  return '<div class="calc" id="kleintjes-calc">' +
+    '<div class="calc-inputs">' +
+      '<div class="calc-field"><label for="calc-amount">Bedrag</label>' +
+        '<div class="calc-money"><span aria-hidden="true">€</span>' +
+        '<input type="number" id="calc-amount" data-calc-amount inputmode="decimal" min="0" step="0.50" value="3.75" aria-label="Bedrag in euro"></div></div>' +
+      '<div class="calc-field"><label for="calc-freq">Hoe vaak?</label>' +
+        '<select id="calc-freq" data-calc-freq>' +
+          '<option value="365">per dag</option>' +
+          '<option value="52">per week</option>' +
+          '<option value="12">per maand</option>' +
+        '</select></div>' +
+    '</div>' +
+    '<div class="stats calc-out" aria-live="polite">' +
+      '<div class="stat"><div class="n" data-calc-year>€ 0</div><div class="l">per jaar</div></div>' +
+      '<div class="stat"><div class="n" data-calc-month>€ 0</div><div class="l">per maand</div></div>' +
+      '<div class="stat"><div class="n" data-calc-decade>€ 0</div><div class="l">over 10 jaar</div></div>' +
+    '</div>' +
+  '</div>';
 }
 function heroArt() {
   return '<svg viewBox="0 0 440 360" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' +
@@ -354,42 +375,48 @@ function heroArt() {
    ============================================================ */
 add("aanpak.html", "Het stappenplan in 5 stappen", "aanpak.html",
   pagehead('Het stappenplan', 'Grip op je geld in 5 stappen',
-    'Dit stappenplan is gebaseerd op de methode die budgetcoaches gebruiken, hier uitgewerkt zodat iedereen het kan volgen. Je hoeft niet alles in één keer te doen: elke stap apart levert al iets op.') +
+    'Dit stappenplan is gebaseerd op de methode die budgetcoaches gebruiken, hier uitgewerkt zodat iedereen het kan volgen. Je hoeft niet alles in één keer te doen: elke stap apart levert al iets op.', 'planning') +
   '<section><div class="wrap with-aside">' +
     '<nav class="toc" aria-label="Op deze pagina"><h4>Op deze pagina</h4><ul>' +
       '<li><a href="#s1">1. Uitgaven in kaart</a></li>' +
-      '<li><a href="#s2">2. Snij in vaste kosten</a></li>' +
-      '<li><a href="#s3">3. Pak grote lekken aan</a></li>' +
+      '<li><a href="#s2">2. Bespaar op maandelijkse kosten</a></li>' +
+      '<li><a href="#s3">3. Pak andere uitgaven aan</a></li>' +
       '<li><a href="#s4">4. Bouw een buffer</a></li>' +
       '<li><a href="#s5">5. Spaar voor je doelen</a></li>' +
     '</ul></nav>' +
     '<div>' +
       '<h2 id="s1">Stap 1 &middot; Breng je uitgaven in kaart</h2>' +
       '<p>Je kan pas besparen als je weet waar je geld naartoe gaat. Overloop je rekeninguittreksels van de voorbije maanden en verdeel alles in categorieën: boodschappen, vaste kosten, vervoer, vrije tijd, abonnementen, enzovoort.</p>' +
-      '<ul class="check"><li>Gebruik een eenvoudige gratis budgetapp of een blad papier. Het hoeft niet ingewikkeld te zijn.</li>' +
+      '<ul class="check"><li>Gebruik een eenvoudige gratis budgetapp (<a class="hl-link" href="https://budgetplanner.wakosta.be/home" target="_blank" rel="noopener">Wakosta budgetplanner</a>) of een blad papier. Het hoeft niet ingewikkeld te zijn.</li>' +
       '<li>Vul niet elke dag in, maar om de paar dagen. Zo blijft het haalbaar en hou je het vol.</li>' +
-      '<li>Let ook op kleine, terugkerende uitgaven. Net die tellen op een jaar hard op.</li></ul>' +
-      callout('tip', '<span class="ic-inline">' + svgIcon('calculator') + '</span> Gratis hulpmiddel: de Wakosta budgetplanner',
-        '<p>Wil je het meteen digitaal aanpakken? Met de gratis <a class="hl-link" href="https://budgetplanner.wakosta.be/home" target="_blank" rel="noopener">Wakosta budgetplanner</a> breng je je inkomsten en uitgaven overzichtelijk in kaart. Tip: vul ze niet dagelijks in, maar om de paar dagen.</p>') +
+      '<li>Let ook op kleine, terugkerende uitgaven. Net die tellen op een jaar hard op.</li>' +
+      '<li>Begin grof. Een ruwe verdeling in 6 à 8 categorieën is genoeg om de grootste lekken te zien. Verfijnen kan later.</li></ul>' +
       example('kleine uitgaven optellen',
         '<p>Een man deed regelmatig kleine aankopen voor gaming. Apart leek dat onschuldig, maar opgeteld over een jaar werd het een fors bedrag. Door alles samen te tellen werd de echte jaarkost pas zichtbaar en bespreekbaar.</p>') +
-      callout('tip', '💡 Tip', '<p>Begin grof. Een ruwe verdeling in 6 à 8 categorieën is genoeg om de grootste lekken te zien. Verfijnen kan later.</p>') +
 
-      '<h2 id="s2">Stap 2 &middot; Snij in vaste kosten en abonnementen</h2>' +
+      '<h2 id="s2">Stap 2 &middot; Bespaar op je maandelijkse kosten</h2>' +
       '<p>Vaste kosten lopen elke maand automatisch door, ook als je ze niet meer gebruikt. Dit is vaak het snelst te besparen, zonder dat je er elke dag mee bezig bent.</p>' +
       '<ul class="check"><li>Overloop al je abonnementen: streaming, fitness, kranten, verzekeringen. Gebruik je het nog?</li>' +
       '<li>Vergelijk energie (V-test) en telecom (Bestetarief.be) en stap over als het goedkoper kan.</li>' +
       '<li>Controleer of je recht hebt op het sociaal tarief of andere premies.</li></ul>' +
-      '<p><a href="abonnementen.html">→ Gids: abonnementen en vaste kosten</a> &nbsp;·&nbsp; <a href="energie-water.html">Energie</a> &nbsp;·&nbsp; <a href="telecom.html">Telecom</a></p>' +
+      '<div class="grid cols-3" style="margin-top:1.4rem">' +
+        gcard("⚡", "Energie &amp; water", "Sociaal tarief, vergelijken en verbruik verlagen.", "energie-water.html") +
+        gcard("📱", "Telecom &amp; internet", "Goedkoper bellen en surfen.", "telecom.html") +
+        gcard("🔁", "Andere maandelijkse kosten", "Streaming, fitness, verzekeringen en goede doelen.", "abonnementen.html") +
+      '</div>' +
 
-      '<h2 id="s3">Stap 3 &middot; Pak de grote lekken aan</h2>' +
+      '<h2 id="s3">Stap 3 &middot; Pak andere uitgaven aan</h2>' +
       '<p>Naast veel kleine uitgaven zijn er soms enkele grote lekken: een dure gewoonte, een lening, of een betaling waar je geen waar voor krijgt.</p>' +
       '<ul class="cross check"><li>Persoonlijke leningen voor dagelijkse uitgaven of luxe worden afgeraden.</li>' +
       '<li>Dure gewoontes (roken, dagelijks frisdrank of takeaway) kosten vaak honderden euro&#39;s per maand.</li>' +
       '<li>Onbekende of louche domiciliëringen: controleer wat er maandelijks van je rekening gaat.</li></ul>' +
       example('een verborgen, ongewenste betaling',
         '<p>Bij een gezin ging elke maand geld naar een bedrijf waarvan ze het bestaan amper kenden: een verzekering die ongemerkt was meegekomen bij de aankoop van een toestel. Test-Aankoop en reviewsites bevestigden veel klachten. De aanpak: 1) de domiciliëring blokkeren bij de bank, 2) per aangetekende brief opzeggen bij het bedrijf.</p>') +
-      '<p><a href="schulden-oplichting.html">→ Gids: schulden, oplichting en ongewenste betalingen</a></p>' +
+      '<div class="grid cols-3" style="margin-top:1.4rem">' +
+        gcard("🛒", "Boodschappen", "Huismerken, slimmer winkelen en minder weggooien.", "boodschappen.html") +
+        gcard("🛡️", "Schulden &amp; oplichting", "Leningen, ongewenste betalingen en oplichting.", "schulden-oplichting.html") +
+        gcard("🧮", "Vele kleintjes", "Hoe kleine dagelijkse uitgaven op een jaar oplopen.", "kleine-uitgaven.html") +
+      '</div>' +
 
       '<h2 id="s4">Stap 4 &middot; Bouw een buffer van 3 tot 6 maanden</h2>' +
       '<p>Een spaarbuffer geeft rust en vangt onverwachte kosten op. Een vaak gehanteerde vuistregel: hou drie tot zes maanden vaste lasten (of inkomen) opzij. Voor een koppel is dat de som van beide inkomens, maal de gekozen aantal maanden.</p>' +
@@ -410,12 +437,13 @@ add("aanpak.html", "Het stappenplan in 5 stappen", "aanpak.html",
 /* ============================================================
    GIDSEN (hub)
    ============================================================ */
-add("gidsen.html", "Waarop besparen?", "gidsen.html",
-  pagehead('Waarop besparen?', 'Waarop kan je besparen?',
-    'Per thema leggen we uit waar je op kan besparen, met concrete voorbeelden en de juiste officiële links. Begin gerust bij het onderwerp dat voor jou nu het zwaarst weegt.') +
+add("gidsen.html", "Spaargidsen", "gidsen.html",
+  pagehead('Spaargidsen', 'Waarop kan je besparen?',
+    'Per thema leggen we uit waar je op kan besparen, met concrete voorbeelden en de juiste officiële links. Begin gerust bij het onderwerp dat voor jou nu het zwaarst weegt.', 'guides') +
   '<section><div class="wrap">' +
     '<div class="grid cols-3">' +
       gcard("🛒", "Boodschappen", "Huismerken, slimmer winkelen en minder weggooien.", "boodschappen.html") +
+      gcard("🧮", "Vele kleintjes", "Hoe kleine dagelijkse uitgaven op een jaar oplopen.", "kleine-uitgaven.html") +
       gcard("🔁", "Abonnementen &amp; vaste kosten", "Streaming, fitness, verzekeringen en goede doelen.", "abonnementen.html") +
       gcard("⚡", "Energie &amp; water", "Sociaal tarief, vergelijken en verbruik verlagen.", "energie-water.html") +
       gcard("📱", "Telecom &amp; internet", "Goedkoper bellen en surfen.", "telecom.html") +
@@ -431,13 +459,58 @@ add("gidsen.html", "Waarop besparen?", "gidsen.html",
   '</div></section>'
 );
 
+/* ---------------- VELE KLEINTJES ---------------- */
+add("kleine-uitgaven.html", "Vele kleintjes maken een groot bedrag", "gidsen.html",
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Vele kleintjes', 'Vele kleintjes maken een groot bedrag',
+    'Een koffie hier, een blikje daar: apart lijkt het niets. Maar kleine, dagelijkse uitgaven tellen op een jaar verrassend hard op. Hieronder zie je hoe, met een rekenhulp om het voor jezelf uit te rekenen.', 'guides') +
+  '<section><div class="wrap"><div class="measure">' +
+    '<h2>Waarom kleine bedragen zo zwaar wegen</h2>' +
+    '<p>Een uitgave van een paar euro voelt onschuldig aan. Het venijn zit in de herhaling: iets wat je elke dag koopt, koop je 365 keer per jaar. Net die optelsom maakt het verschil, en is meteen ook de eenvoudigste plek om te besparen zonder dat je leven er echt anders door wordt.</p>' +
+    '<p>Begin daarom met je terugkerende uitgaven samen te tellen. Pas wanneer je de jaarkost ziet, wordt zichtbaar wat een gewoonte je echt kost en kan je bewust kiezen.</p>' +
+  '</div></div></section>' +
+  '<section class="section-alt"><div class="wrap"><div class="measure">' +
+    '<p class="eyebrow">Reken het zelf uit</p>' +
+    '<h2>Wat kost een gewoonte per jaar?</h2>' +
+    '<p>Vul in hoeveel je aan iets uitgeeft en hoe vaak. Je ziet meteen wat het je per jaar (en op tien jaar) kost.</p>' +
+    calculator() +
+    '<p class="muted" style="font-size:.85rem;margin-top:.8rem">Een schatting ter illustratie. We houden geen rekening met prijsstijgingen of rente.</p>' +
+  '</div></div></section>' +
+  '<section><div class="wrap"><div class="measure">' +
+    '<h2>Voorbeelden uit echte gezinsbudgetten</h2>' +
+    '<p>Deze cijfers komen uit echte budgetten. Apart leek elke uitgave klein, maar op een jaar liep het flink op.</p>' +
+    stats([
+      { n: "€ 4.000", l: "per jaar aan sigaretten in één gezin (€ 334 per maand)" },
+      { n: "€ 1.368", l: "per jaar voor 5 blikjes frisdrank per dag" },
+      { n: "€ 540", l: "per jaar bespaard met huismerk-luiers in plaats van een A-merk" },
+    ]) +
+    '<p class="muted" style="font-size:.85rem;margin-top:.8rem">Cijfers ter illustratie. Jouw situatie kan verschillen.</p>' +
+    example('kleine uitgaven optellen',
+      '<p>Een man deed regelmatig kleine aankopen voor gaming. Apart leek dat onschuldig, maar opgeteld over een jaar werd het een fors bedrag. Door alles samen te tellen werd de echte jaarkost pas zichtbaar en bespreekbaar.</p>') +
+    example('frisdrank en de blinde test',
+      '<p>Een tiener dronk 5 blikjes cola per dag. Aan € 0,75 per blikje is dat € 3,75 per dag en zo&#39;n € 1.368 per jaar. In een blinde test gaf hij de cola 4/10 en een huismerk 7/10. Minder blikjes én een goedkoper merk: dubbele winst.</p>') +
+    example('belegde broodjes en takeaway',
+      '<p>Bij meerdere gezinnen ging een groot deel van het budget naar takeaway en horeca. Vaker zelf koken bleek telkens een van de eenvoudigste manieren om fors te besparen.</p>') +
+    callout('tip', '☕ Eénmalige aankoop, jaarlijkse winst', '<p>Een volautomatische koffiemachine in plaats van cups kan ongeveer € 600 per jaar besparen. Bereken bij zo&#39;n aankoop altijd de terugverdientijd.</p>') +
+    '<h2>Zo pak je het aan</h2>' +
+    '<ul class="check">' +
+      '<li>Overloop je rekeninguittreksels en tel je terugkerende kleine uitgaven samen per jaar.</li>' +
+      '<li>Kies één of twee gewoontes om te verminderen, niet alles tegelijk. Zo hou je het vol.</li>' +
+      '<li>Test goedkopere alternatieven (huismerk, zelf maken) blind. Vaak merk je het verschil niet.</li>' +
+      '<li>Zet wat je bespaart meteen apart, zodat de winst zichtbaar wordt.</li>' +
+    '</ul>' +
+    '<p><a href="boodschappen.html">→ Gids: besparen op boodschappen</a> &nbsp;·&nbsp; <a href="aanpak.html">Het stappenplan</a></p>' +
+    disclaimer('Algemene informatie, geen persoonlijk financieel advies. Bedragen zijn voorbeelden ter illustratie. Voor begeleiding op maat kan je gratis terecht bij het CAW of je OCMW.') +
+  '</div></div></section>',
+  'Kleine dagelijkse uitgaven tellen op een jaar hard op. Reken met onze rekenhulp uit wat een gewoonte je per jaar kost.'
+);
+
 /* helper voor gidsinhoud */
 function guide(intro, blocks) { return intro + '<section><div class="wrap"><div class="measure">' + blocks + '</div></div></section>'; }
 
 /* ---------------- BOODSCHAPPEN ---------------- */
 add("boodschappen.html", "Besparen op boodschappen", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Boodschappen', 'Besparen op boodschappen',
-    'Eten en drinken is een van de grootste posten in een gezinsbudget, en net daar valt veel te winnen zonder echt in te boeten op kwaliteit of plezier.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Boodschappen', 'Besparen op boodschappen',
+    'Eten en drinken is een van de grootste posten in een gezinsbudget, en net daar valt veel te winnen zonder echt in te boeten op kwaliteit of plezier.', 'groceries') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Huismerken: vaak even goed, soms beter</h2>' +
     '<p>Huismerken (de eigen merken van de supermarkt) zijn gemiddeld duidelijk goedkoper dan A-merken, terwijl de kwaliteit volgens onafhankelijke tests vaak gelijkwaardig of zelfs beter is. Veel huismerken rollen bovendien van dezelfde productieband als de bekende merken.</p>' +
@@ -471,8 +544,8 @@ add("boodschappen.html", "Besparen op boodschappen", "gidsen.html",
 
 /* ---------------- ABONNEMENTEN ---------------- */
 add("abonnementen.html", "Abonnementen en vaste kosten", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Abonnementen', 'Abonnementen en vaste kosten',
-    'Vaste kosten lopen elke maand automatisch door, ook als je ze nauwelijks gebruikt. Een grondige opkuis levert vaak meteen het meeste op, en je hoeft het maar één keer te doen.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Abonnementen', 'Abonnementen en vaste kosten',
+    'Vaste kosten lopen elke maand automatisch door, ook als je ze nauwelijks gebruikt. Een grondige opkuis levert vaak meteen het meeste op, en je hoeft het maar één keer te doen.', 'subscriptions') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Maak de lijst van alles wat doorloopt</h2>' +
     '<p>Overloop je rekening van de voorbije maanden en noteer elk abonnement en elke domiciliëring: streamingdiensten, muziek, fitness, kranten en tijdschriften, verzekeringen, software, goede doelen, alarmsystemen.</p>' +
@@ -502,8 +575,8 @@ add("abonnementen.html", "Abonnementen en vaste kosten", "gidsen.html",
 
 /* ---------------- ENERGIE & WATER ---------------- */
 add("energie-water.html", "Besparen op energie en water", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Energie &amp; water', 'Besparen op energie en water',
-    'Energie is voor veel gezinnen een zware en sterk schommelende kost. Met de juiste formule, een mogelijke korting en wat gewoonteveranderingen bespaar je vaak honderden euro&#39;s per jaar.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Energie &amp; water', 'Besparen op energie en water',
+    'Energie is voor veel gezinnen een zware en sterk schommelende kost. Met de juiste formule, een mogelijke korting en wat gewoonteveranderingen bespaar je vaak honderden euro&#39;s per jaar.', 'utilities') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Vergelijk je energiecontract met de V-test</h2>' +
     '<p>De V-test van de VREG is de officiële, onafhankelijke vergelijking van alle energiecontracten in Vlaanderen. Je geeft je verbruik in en ziet meteen of je goedkoper af bent bij een ander contract of een andere leverancier.</p>' +
@@ -531,8 +604,8 @@ add("energie-water.html", "Besparen op energie en water", "gidsen.html",
 
 /* ---------------- TELECOM ---------------- */
 add("telecom.html", "Besparen op telecom en internet", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Telecom', 'Besparen op telecom en internet',
-    'Veel mensen betalen jaar na jaar te veel voor bellen, sms&#39;en en internet, simpelweg omdat ze nooit vergelijken. Overstappen is makkelijker dan het lijkt.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Telecom', 'Besparen op telecom en internet',
+    'Veel mensen betalen jaar na jaar te veel voor bellen, sms&#39;en en internet, simpelweg omdat ze nooit vergelijken. Overstappen is makkelijker dan het lijkt.', 'subscriptions') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Vergelijk met Bestetarief.be</h2>' +
     '<p>Bestetarief.be is de officiële, gratis vergelijkingstool van het BIPT (de telecomwaakhond). Je geeft je gebruik in (bellen, data, internet, tv) en ziet welk tariefplan het best bij je past, bij alle operatoren.</p>' +
@@ -557,8 +630,8 @@ add("telecom.html", "Besparen op telecom en internet", "gidsen.html",
 
 /* ---------------- WONEN ---------------- */
 add("wonen.html", "Besparen op wonen", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Wonen', 'Wonen: premies, leningen en slimme keuzes',
-    'Wonen is meestal de grootste kost in een budget. Er bestaan Vlaamse premies en leningen die veel mensen mislopen, en soms is een andere woonvorm een grote besparing.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Wonen', 'Wonen: premies, leningen en slimme keuzes',
+    'Wonen is meestal de grootste kost in een budget. Er bestaan Vlaamse premies en leningen die veel mensen mislopen, en soms is een andere woonvorm een grote besparing.', 'housing') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Huurpremie en huursubsidie</h2>' +
     '<p>De Vlaamse overheid heeft twee tegemoetkomingen voor huurders met een bescheiden inkomen. Veel mensen weten niet dat ze er recht op hebben.</p>' +
@@ -587,8 +660,8 @@ add("wonen.html", "Besparen op wonen", "gidsen.html",
 
 /* ---------------- WERK & INKOMEN ---------------- */
 add("werk-inkomen.html", "Werk en inkomen", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Werk &amp; inkomen', 'Meer overhouden: werk en inkomen',
-    'Besparen is één kant. De andere kant is wat er binnenkomt. Soms levert een eerlijke check van je loon of een slimme bijverdienste meer op dan eindeloos snoeien.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Werk &amp; inkomen', 'Meer overhouden: werk en inkomen',
+    'Besparen is één kant. De andere kant is wat er binnenkomt. Soms levert een eerlijke check van je loon of een slimme bijverdienste meer op dan eindeloos snoeien.', 'work') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Check of je loon klopt</h2>' +
     '<p>Weet je hoeveel je netto per gewerkt uur verdient? Reken het eens uit. Soms blijkt dat een andere job of een ander statuut financieel een wereld van verschil maakt.</p>' +
@@ -616,8 +689,8 @@ add("werk-inkomen.html", "Werk en inkomen", "gidsen.html",
 
 /* ---------------- GEZIN & KINDEREN ---------------- */
 add("gezin-kinderen.html", "Gezin en kinderen", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Gezin &amp; kinderen', 'Gezin en kinderen: kosten en toeslagen',
-    'Kinderen brengen kosten mee, maar ook rechten. Van het Groeipakket tot studietoelagen en slimme tweedehandsoplossingen: hier zie je waar je op kan besparen en wat je kan aanvragen.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Gezin &amp; kinderen', 'Gezin en kinderen: kosten en toeslagen',
+    'Kinderen brengen kosten mee, maar ook rechten. Van het Groeipakket tot studietoelagen en slimme tweedehandsoplossingen: hier zie je waar je op kan besparen en wat je kan aanvragen.', 'family') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Studeren: ken de kosten én de steun</h2>' +
     '<p>Hoger onderwijs kost geld, maar er is meer steun dan veel ouders denken. Breng de kosten in kaart en check je recht op een studietoelage.</p>' +
@@ -655,8 +728,8 @@ add("gezin-kinderen.html", "Gezin en kinderen", "gidsen.html",
 
 /* ---------------- GEZONDHEID ---------------- */
 add("gezondheid.html", "Gezondheid en zorg", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Gezondheid &amp; zorg', 'Gezondheid: terugbetalingen en rechten',
-    'Medische kosten lopen snel op, maar je krijgt vaak meer terugbetaald dan je denkt. Het begint bij je facturen tijdig indienen en je rechten kennen.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Gezondheid &amp; zorg', 'Gezondheid: terugbetalingen en rechten',
+    'Medische kosten lopen snel op, maar je krijgt vaak meer terugbetaald dan je denkt. Het begint bij je facturen tijdig indienen en je rechten kennen.', 'health') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Dien je medische facturen altijd in</h2>' +
     '<p>Onkostennota&#39;s en getuigschriften die je niet indient bij je ziekenfonds, leveren geen terugbetaling op. Het is geld dat zomaar blijft liggen.</p>' +
@@ -683,8 +756,8 @@ add("gezondheid.html", "Gezondheid en zorg", "gidsen.html",
 
 /* ---------------- SPAREN & BUFFER ---------------- */
 add("sparen-buffer.html", "Sparen en je buffer", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Sparen &amp; buffer', 'Sparen en je buffer opbouwen',
-    'Sparen lukt het best met een doel en een plan. Met een buffer voor onverwachte kosten en gericht sparen voor je dromen krijg je rust én vooruitgang.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Sparen &amp; buffer', 'Sparen en je buffer opbouwen',
+    'Sparen lukt het best met een doel en een plan. Met een buffer voor onverwachte kosten en gericht sparen voor je dromen krijg je rust én vooruitgang.', 'savings') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Eerst een buffer voor onverwachte kosten</h2>' +
     '<p>Een spaarbuffer is je financiële schokdemper. Een vaak gebruikte vuistregel is drie tot zes maanden vaste lasten of inkomen opzij houden. Voor een koppel reken je met beide inkomens samen.</p>' +
@@ -714,8 +787,8 @@ add("sparen-buffer.html", "Sparen en je buffer", "gidsen.html",
 
 /* ---------------- SCHULDEN & OPLICHTING ---------------- */
 add("schulden-oplichting.html", "Schulden en oplichting", "gidsen.html",
-  pagehead('<a href="gidsen.html">Waarop besparen?</a> <span>›</span> Schulden &amp; oplichting', 'Schulden, oplichting en ongewenste betalingen',
-    'Wanneer er meer buitengaat dan binnenkomt, of wanneer geld verdwijnt naar wie er geen recht op heeft, is snel en gericht ingrijpen belangrijk. Je hoeft dat niet alleen te doen.') +
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Schulden &amp; oplichting', 'Schulden, oplichting en ongewenste betalingen',
+    'Wanneer er meer buitengaat dan binnenkomt, of wanneer geld verdwijnt naar wie er geen recht op heeft, is snel en gericht ingrijpen belangrijk. Je hoeft dat niet alleen te doen.', 'debt') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Negatieve cashflow: keer het tij</h2>' +
     '<p>Geef je structureel meer uit dan er binnenkomt, dan teren je reserves op of groeien je schulden. De eerste stap is altijd: in kaart brengen waar het geld naartoe gaat.</p>' +
@@ -748,7 +821,7 @@ add("schulden-oplichting.html", "Schulden en oplichting", "gidsen.html",
 /* ---------------- RECHTEN & PREMIES ---------------- */
 add("rechten-premies.html", "Rechten en premies", "rechten-premies.html",
   pagehead('Rechten &amp; premies', 'Rechten en premies die je misschien misloopt',
-    'In Vlaanderen en België bestaan duizenden premies, toeslagen en sociale tarieven. Veel mensen vragen ze niet aan, gewoon omdat ze niet weten dat ze er recht op hebben. Hier vind je de belangrijkste, met de officiële weg ernaartoe.') +
+    'In Vlaanderen en België bestaan duizenden premies, toeslagen en sociale tarieven. Veel mensen vragen ze niet aan, gewoon omdat ze niet weten dat ze er recht op hebben. Hier vind je de belangrijkste, met de officiële weg ernaartoe.', 'rights') +
   '<section><div class="wrap"><div class="measure">' +
     '<div class="callout info"><p class="t">🧭 Begin hier: de Rechtenverkenner</p><p>De Rechtenverkenner van de Vlaamse overheid bundelt premies, toeslagen en sociale rechten van álle overheden (lokaal, Vlaams en federaal) op één plek. Je zoekt op je situatie en ziet meteen waar je recht op hebt.</p><p style="margin-bottom:0"><a class="ext" href="' + L.rechtenverkenner.url + '" target="_blank" rel="noopener"><strong>Open de Rechtenverkenner ↗</strong></a></p></div>' +
 
@@ -770,7 +843,7 @@ add("rechten-premies.html", "Rechten en premies", "rechten-premies.html",
 
 /* ---------------- HULP NODIG ---------------- */
 add("hulp-nodig.html", "Hulp nodig", "hulp-nodig.html",
-  '<div class="pagehead"><div class="wrap">' +
+  '<div class="pagehead header-bg-rights"><div class="wrap">' +
     '<nav class="crumbs" aria-label="kruimelpad"><a href="index.html">Home</a><span>›</span> Hulp nodig</nav>' +
     '<h1>Hulp nodig? Je staat er niet alleen voor</h1>' +
     '<p>Kom je niet rond, stapelen de rekeningen zich op, of weet je even niet meer waar te beginnen? Hulp is gratis, vertrouwelijk en er is geen reden om je te schamen. Hoe vroeger je aanklopt, hoe meer er mogelijk is.</p>' +
@@ -805,7 +878,7 @@ add("hulp-nodig.html", "Hulp nodig", "hulp-nodig.html",
 /* ---------------- OVER ---------------- */
 add("over.html", "Over Centiem", "over.html",
   pagehead('Over', 'Over Centiem',
-    'Centiem is een onafhankelijk Vlaams platform dat mensen helpt om bewuster met geld om te gaan en te besparen. Voor iedereen, en in het bijzonder voor wie het financieel moeilijker heeft.') +
+    'Centiem is een onafhankelijk Vlaams platform dat mensen helpt om bewuster met geld om te gaan en te besparen. Voor iedereen, en in het bijzonder voor wie het financieel moeilijker heeft.', 'home') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Waar we voor staan</h2>' +
     '<div class="grid cols-2">' +
