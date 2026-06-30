@@ -6,6 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 const OUT = __dirname;
+const ASSET_VERSION = "20260630-side-rail-micro";
 
 /* ---------- centrale, geverifieerde links ---------- */
 const L = {
@@ -236,12 +237,12 @@ function page(opts) {
     '<link rel="icon" type="image/svg+xml" href="favicon.svg">\n' +
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
     '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">\n' +
-    '<link rel="stylesheet" href="assets/styles.css">\n' +
+    '<link rel="stylesheet" href="assets/styles.css?v=' + ASSET_VERSION + '">\n' +
     '</head>\n<body>\n' +
     header(opts.active) +
     '<main id="main">\n' + replaceEmoji(opts.body) + '\n</main>\n' +
     footer() +
-    '\n<script src="assets/app.js"></script>\n</body>\n</html>\n';
+    '\n<script src="assets/app.js?v=' + ASSET_VERSION + '"></script>\n</body>\n</html>\n';
 }
 function pagehead(crumbLabel, h1, intro, bg) {
   return '<div class="pagehead header-bg-' + (bg || 'guides') + '"><div class="wrap"><div class="ph-inner">' +
@@ -374,6 +375,7 @@ function yearlySavingsWidget(id, title, intro, defaultAmount) {
     '<button class="savings-dock" type="button" data-savings-open="' + id + '" aria-controls="savings-modal-' + id + '" aria-expanded="false">' +
       '<span class="savings-dock-icon">' + svgIcon("calculator") + '</span>' +
       '<span class="savings-dock-copy"><span>Rekenhulp</span><strong>Bereken je jaarwinst</strong><em>maandbedrag × 12</em></span>' +
+      '<svg class="savings-dock-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>' +
     '</button>' +
     '<div class="savings-overlay" data-savings-overlay="' + id + '" hidden></div>' +
     '<aside class="savings-modal" id="savings-modal-' + id + '" role="dialog" aria-modal="true" aria-labelledby="savings-title-' + id + '" hidden>' +
@@ -664,7 +666,7 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
     'Veel mensen betalen jaar na jaar te veel voor bellen, sms&#39;en, internet, tv en streaming, simpelweg omdat ze nooit vergelijken of hun pakket nooit opnieuw bekijken. Overstappen of slimmer combineren is makkelijker dan het lijkt.', 'subscriptions') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Vergelijk met Bestetarief.be</h2>' +
-    '<p><a class="hl-link" href="' + L.bestetarief.url + '" target="_blank" rel="noopener">Bestetarief.be</a> is de officiële, gratis vergelijkingstool van het BIPT (de telecomwaakhond). Je geeft je gebruik in (bellen, data, internet, tv) en ziet welk tariefplan het best bij je past, bij alle operatoren. <strong>Bestetarief vergelijkt de actuele tarieven.</strong> Volgens het BIPT kan je door je mobiele tariefplan te vergelijken <strong>al snel tot € 120 per jaar besparen</strong>, en voor een gezin met meerdere abonnementen loopt dat verder op.</p>' +
+    '<p><a class="hl-link" href="' + L.bestetarief.url + '" target="_blank" rel="noopener">Bestetarief.be</a> is de officiële, gratis vergelijkingstool van het BIPT (de telecomwaakhond). Je geeft je gebruik in (bellen, data, internet, tv) en ziet welk tariefplan het best bij je past, bij alle operatoren. Bestetarief <strong>vergelijkt de actuele tarieven.</strong> Volgens het BIPT kan je door je mobiele tariefplan te vergelijken al snel tot <strong>€ 120 per jaar besparen</strong>, en voor een gezin met meerdere abonnementen loopt dat verder op.</p>' +
 
     '<h2>Gsm-abonnement</h2>' +
     '<p>Bij gsm-abonnementen is het verschil tussen de bekende, traditionele providers en de zogenaamde prijsbrekers vaak groot. Voor vergelijkbaar bel- en datagebruik betaal je bij een prijsbreker doorgaans een flink stuk minder per maand, zonder dat je veel hoeft in te leveren. <strong>Bij een overstap mag je bovendien altijd je huidig telefoonnummer gratis behouden.</strong></p>' +
@@ -773,6 +775,37 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
     '</div>' +
     disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
 
+    '<h2>Muziek streamen</h2>' +
+    '<p>Spotify is de populairste muziekdienst in België. Het <strong>gratis abonnement</strong> geeft toegang tot alle muziek, maar met reclame en zonder de vrijheid om zelf nummers te kiezen. <strong>Spotify Premium</strong> haalt die beperkingen weg — voor een stuk minder dan veel mensen denken.</p>' +
+    '<div class="table-wrap">' +
+      '<table class="compare-table compare-table--vcenter">' +
+        '<thead><tr>' +
+          '<th><span class="th-brand"><img src="assets/logos/logo_spotify.svg" class="th-brand-logo" alt="">Spotify Premium</span></th>' +
+          '<th><span class="th-brand"><img src="assets/logos/logo_spotify.svg" class="th-brand-logo" alt="">Spotify Gratis</span></th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+          '<tr>' +
+            '<td><div class="cell-features"><ul class="check">' +
+              '<li>Geen reclame</li>' +
+              '<li>Zelf nummers kiezen</li>' +
+              '<li>Offline luisteren</li>' +
+              '<li>Hogere geluidskwaliteit</li>' +
+            '</ul></div></td>' +
+            '<td><div class="cell-features"><ul class="check cross">' +
+              '<li>Reclame tussendoor</li>' +
+              '<li>Enkel shuffle, geen vrije keuze</li>' +
+              '<li>Niet offline beschikbaar</li>' +
+            '</ul></div></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="price-tag price-hi">€ 10,99 <small>per maand</small></span></td>' +
+            '<td><span class="price-tag price-lo">Gratis</span></td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+    disclaimer('Indicatieve prijs Spotify Premium Individueel, juni 2026. Ook beschikbaar: Duo (€ 14,99) en Gezin (€ 17,99) per maand.') +
+
     '<h2>Nuttige links</h2>' +
     linklist(['bestetarief', 'bipt', 'ombudsTelecom']) +
     disclaimer('Besparingsbedragen zijn indicaties van het BIPT; je eigen winst hangt af van je huidige abonnement en gebruik.') +
@@ -792,6 +825,7 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
 
       '<h3>Vuistregel snelheid</h3>' +
       '<div class="drawer-speed-pills">' +
+        '<div class="speed-pill"><span class="sp-speed">30 Mbps</span><span class="sp-label">Voldoende voor licht gebruik en één à twee streams</span></div>' +
         '<div class="speed-pill"><span class="sp-speed">50 Mbps</span><span class="sp-label">Ruim voldoende voor een klein gezin dat streamt</span></div>' +
         '<div class="speed-pill"><span class="sp-speed">100 Mbps</span><span class="sp-label">Comfortabel voor de meeste gezinnen</span></div>' +
         '<div class="speed-pill sp-pill-hi"><span class="sp-speed">200 Mbps+</span><span class="sp-label">Nuttig als je met veel mensen tegelijk streamt, grote bestanden downloadt of vaak games installeert</span></div>' +
@@ -865,14 +899,18 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
       '<table class="drawer-table">' +
         '<thead><tr><th>Activiteit</th><th>Data per uur</th></tr></thead>' +
         '<tbody>' +
-          '<tr><td>TikTok / Reels / Shorts</td><td>± 0,5–1 GB</td></tr>' +
-          '<tr><td>YouTube / Netflix (HD)</td><td>± 1,5–3 GB</td></tr>' +
-          '<tr><td>Muziek streamen (Spotify)</td><td>± 50–150 MB</td></tr>' +
-          '<tr><td>Navigatie (Maps)</td><td>± 5–10 MB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/app_tiktok.png" class="act-icon" alt="" loading="lazy">TikTok / Reels / Shorts</span></td><td>± 0,5–1 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/logo_youtube.svg" class="act-icon act-icon--yt" alt="" loading="lazy">YouTube / Netflix (HD)</span></td><td>± 1,5–3 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/logo_spotify.svg" class="act-icon" alt="" loading="lazy">Muziek streamen (Spotify)</span></td><td>± 50–150 MB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/app_maps.png" class="act-icon" alt="" loading="lazy">Navigatie (Maps)</span></td><td>± 5–10 MB</td></tr>' +
         '</tbody>' +
       '</table>' +
       '<p style="font-size:.88rem;color:var(--muted)">Reken dus eerlijk in hoeveel je écht onderweg surft. Twijfel je? Een prijsbreker met wat meer data (€ 5–10) zit nog altijd ruim onder de prijs van de traditionele providers.</p>' +
-      '<p style="margin-top:1.2rem"><a class="btn btn-ghost" href="https://www.digi-belgium.be/nl/gsm-abonnement" target="_blank" rel="noopener">Bekijk het Digi gsm-abonnement</a></p>' +
+      '<a class="digi-cta" href="https://www.digi-belgium.be/nl/gsm-abonnement" target="_blank" rel="noopener">' +
+        '<img class="digi-cta-logo" src="assets/logos/logo_digi.svg" alt="Digi">' +
+        '<span class="digi-cta-label">Bekijk het gsm-abonnement</span>' +
+        '<svg class="digi-cta-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>' +
+      '</a>' +
     '</div>' +
   '</aside>' +
   yearlySavingsWidget('telecom-year', 'Wat bespaar je per jaar?', 'Vul het verschil in tussen je oude en nieuwe maandbedrag voor gsm, internet, tv of streaming.', '10')

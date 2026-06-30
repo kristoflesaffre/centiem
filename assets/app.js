@@ -61,8 +61,51 @@
     var closeBtn = widget.querySelector("[data-savings-close]");
     if (!btn || !overlay || !modal || !input || !output) return;
 
-    var usesSideRail = function () {
-      return window.matchMedia && window.matchMedia("(min-width: 1500px)").matches;
+    var syncSideRail = function () {
+      var viewport = window.innerWidth || document.documentElement.clientWidth;
+      var gap = 24;
+      var edge = 24;
+      var minWidth = 180;
+      var microWidth = 220;
+      var tightWidth = 280;
+      var compactWidth = 340;
+      var maxWidth = 440;
+      var contentRight = 0;
+      var selectors = [
+        "main .measure",
+        "main .table-wrap",
+        "main .band",
+        "main .grid",
+        "main .pagehead .ph-inner"
+      ];
+
+      document.querySelectorAll(selectors.join(",")).forEach(function (el) {
+        var rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.right > contentRight) contentRight = rect.right;
+      });
+      if (!contentRight) {
+        var main = document.querySelector("main");
+        if (main) contentRight = main.getBoundingClientRect().right;
+      }
+
+      var available = viewport - contentRight - gap - edge;
+      var sideRail = viewport >= 1180 && available >= minWidth;
+      var panelWidth = Math.max(minWidth, Math.min(maxWidth, Math.floor(available)));
+      widget.classList.toggle("is-side-rail", sideRail);
+      widget.classList.toggle("is-side-rail-compact", sideRail && panelWidth < compactWidth);
+      widget.classList.toggle("is-side-rail-tight", sideRail && panelWidth < tightWidth);
+      widget.classList.toggle("is-side-rail-micro", sideRail && panelWidth < microWidth);
+      if (sideRail) {
+        widget.style.setProperty("--savings-side-left", Math.round(contentRight + gap) + "px");
+        widget.style.setProperty("--savings-side-width", panelWidth + "px");
+      } else {
+        widget.classList.remove("is-side-rail-compact");
+        widget.classList.remove("is-side-rail-tight");
+        widget.classList.remove("is-side-rail-micro");
+        widget.style.removeProperty("--savings-side-left");
+        widget.style.removeProperty("--savings-side-width");
+      }
+      return sideRail;
     };
     var parseAmount = function (raw) {
       var value = String(raw || "").trim().replace(/\s/g, "");
@@ -90,7 +133,7 @@
       output.textContent = euro(monthly * 12);
     };
     var open = function () {
-      var sideRail = usesSideRail();
+      var sideRail = syncSideRail();
       overlay.hidden = false;
       modal.hidden = false;
       modal.setAttribute("aria-modal", sideRail ? "false" : "true");
@@ -129,6 +172,14 @@
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && modal.classList.contains("is-open")) close();
     });
+    window.addEventListener("resize", function () {
+      var sideRail = syncSideRail();
+      if (modal.classList.contains("is-open")) {
+        modal.setAttribute("aria-modal", sideRail ? "false" : "true");
+        document.body.style.overflow = sideRail ? "" : "hidden";
+      }
+    });
+    syncSideRail();
     update();
   });
 
