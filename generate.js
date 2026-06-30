@@ -167,6 +167,7 @@ function replaceEmoji(html) {
 function brandMark() {
   return '<span class="mark"><img src="favicon.svg" alt="" aria-hidden="true"></span>';
 }
+const TELECOM_LABEL = "gsm-abonnenement, internet en streaming";
 const NAV = [
   ["index.html", "Home"],
   ["aanpak.html", "Het stappenplan"],
@@ -199,7 +200,7 @@ function footer() {
         '<li><a href="boodschappen.html">Boodschappen</a></li>' +
         '<li><a href="abonnementen.html">Abonnementen</a></li>' +
         '<li><a href="energie-water.html">Energie &amp; water</a></li>' +
-        '<li><a href="telecom.html">Telecom</a></li>' +
+        '<li><a href="telecom.html">' + TELECOM_LABEL + '</a></li>' +
         '<li><a href="wonen.html">Wonen</a></li>' +
       '</ul></div>' +
       '<div><h4>Thema&#39;s</h4><ul>' +
@@ -238,14 +239,29 @@ function page(opts) {
     '\n<script src="assets/app.js"></script>\n</body>\n</html>\n';
 }
 function pagehead(crumbLabel, h1, intro, bg) {
-  return '<div class="pagehead header-bg-' + (bg || 'guides') + '"><div class="wrap">' +
+  return '<div class="pagehead header-bg-' + (bg || 'guides') + '"><div class="wrap"><div class="ph-inner">' +
     '<nav class="crumbs" aria-label="kruimelpad"><a href="index.html">Home</a><span>›</span>' + crumbLabel + '</nav>' +
     '<h1>' + h1 + '</h1><p>' + intro + '</p>' +
-  '</div></div>';
+  '</div></div></div>';
 }
 
 const PAGES = [];
 function add(file, title, active, body, desc) { PAGES.push({ file: file, html: page({ title: title, active: active, body: body, desc: desc }) }); }
+const CARD_IMAGES = {
+  "boodschappen.html": "groceries",
+  "abonnementen.html": "subscriptions",
+  "energie-water.html": "energy",
+  "telecom.html": "telecom",
+  "wonen.html": "housing",
+  "werk-inkomen.html": "work",
+  "gezin-kinderen.html": "family",
+  "gezondheid.html": "health",
+  "sparen-buffer.html": "savings",
+  "schulden-oplichting.html": "debt",
+  "rechten-premies.html": "rights",
+  "hulp-nodig.html": "help",
+  "kleine-uitgaven.html": "small-expenses",
+};
 
 /* ============================================================
    HOME
@@ -291,7 +307,7 @@ add("index.html", "Slim met geld, voor iedereen", "index.html", '' +
       gcard("🛒", "Boodschappen", "Huismerken, slimmer winkelen, minder weggooien.", "boodschappen.html") +
       gcard("🔁", "Abonnementen", "Streaming, fitness, verzekeringen: wat gebruik je echt?", "abonnementen.html") +
       gcard("⚡", "Energie &amp; water", "Sociaal tarief, vergelijken en verbruik verlagen.", "energie-water.html") +
-      gcard("📱", "Telecom &amp; internet", "Goedkoper bellen en surfen door te vergelijken.", "telecom.html") +
+      gcard("📱", TELECOM_LABEL, "Goedkoper bellen, surfen en streamen door te vergelijken.", "telecom.html") +
       gcard("🏠", "Wonen", "Huurpremie, sociale lening, huren of kopen.", "wonen.html") +
       gcard("💼", "Werk &amp; inkomen", "Je loon checken, bijverdienen, meer overhouden.", "werk-inkomen.html") +
       gcard("👨‍👩‍👧", "Gezin &amp; kinderen", "Studeren, zakgeld, kinderbijslag en toeslagen.", "gezin-kinderen.html") +
@@ -316,10 +332,11 @@ add("index.html", "Slim met geld, voor iedereen", "index.html", '' +
   '</div></div></section>'
 );
 function gcard(ic, title, txt, href) {
-  return '<a class="card link-card" href="' + href + '">' +
-    '<div class="card-head"><div class="ic">' + ic + '</div>' +
-    '<div class="card-body"><h3>' + title + '</h3><p>' + txt + '</p></div></div>' +
-    '<span class="more">Bekijk gids ' + svgIcon("arrowright") + '</span></a>';
+  const image = CARD_IMAGES[href] || "small-expenses";
+  return '<a class="card link-card photo-card" href="' + href + '">' +
+    '<div class="card-media"><img src="assets/cards/' + image + '.webp" alt="" loading="lazy" decoding="async"></div>' +
+    '<div class="card-body"><h3>' + title + '</h3><p>' + txt + '</p></div>' +
+  '</a>';
 }
 function calculator() {
   return '<div class="calc" id="kleintjes-calc">' +
@@ -327,17 +344,17 @@ function calculator() {
       '<div class="calc-field"><label for="calc-amount">Bedrag</label>' +
         '<div class="calc-money"><span aria-hidden="true">€</span>' +
         '<input type="number" id="calc-amount" data-calc-amount inputmode="decimal" min="0" step="0.50" value="3.75" aria-label="Bedrag in euro"></div></div>' +
-      '<div class="calc-field"><label for="calc-freq">Hoe vaak?</label>' +
-        '<select id="calc-freq" data-calc-freq>' +
-          '<option value="365">per dag</option>' +
-          '<option value="52">per week</option>' +
-          '<option value="12">per maand</option>' +
-        '</select></div>' +
+      '<div class="calc-field"><span class="calc-label">Hoe vaak?</span>' +
+        '<div class="calc-seg" data-calc-freq role="group" aria-label="Hoe vaak?">' +
+          '<label class="seg-opt"><input type="radio" name="calc-freq" value="365" checked><span>per dag</span></label>' +
+          '<label class="seg-opt"><input type="radio" name="calc-freq" value="52"><span>per week</span></label>' +
+          '<label class="seg-opt"><input type="radio" name="calc-freq" value="12"><span>per maand</span></label>' +
+        '</div></div>' +
     '</div>' +
     '<div class="stats calc-out" aria-live="polite">' +
-      '<div class="stat"><div class="n" data-calc-year>€ 0</div><div class="l">per jaar</div></div>' +
       '<div class="stat"><div class="n" data-calc-month>€ 0</div><div class="l">per maand</div></div>' +
-      '<div class="stat"><div class="n" data-calc-decade>€ 0</div><div class="l">over 10 jaar</div></div>' +
+      '<div class="stat"><div class="n" data-calc-year>€ 0</div><div class="l">per jaar</div></div>' +
+      '<div class="stat"><div class="n" data-calc-decade>€ 0</div><div class="l">na 10 jaar</div></div>' +
     '</div>' +
   '</div>';
 }
@@ -385,27 +402,25 @@ add("aanpak.html", "Het stappenplan in 5 stappen", "aanpak.html",
       '<li><a href="#s5">5. Spaar voor je doelen</a></li>' +
     '</ul></nav>' +
     '<div>' +
-      '<h2 id="s1">Stap 1 &middot; Breng je uitgaven in kaart</h2>' +
+      '<h2 id="s1"><span class="step-badge">STAP 1</span> Breng je uitgaven in kaart</h2>' +
       '<p>Je kan pas besparen als je weet waar je geld naartoe gaat. Overloop je rekeninguittreksels van de voorbije maanden en verdeel alles in categorieën: boodschappen, vaste kosten, vervoer, vrije tijd, abonnementen, enzovoort.</p>' +
-      '<ul class="check"><li>Gebruik een eenvoudige gratis budgetapp (<a class="hl-link" href="https://budgetplanner.wakosta.be/home" target="_blank" rel="noopener">Wakosta budgetplanner</a>) of een blad papier. Het hoeft niet ingewikkeld te zijn.</li>' +
-      '<li>Vul niet elke dag in, maar om de paar dagen. Zo blijft het haalbaar en hou je het vol.</li>' +
-      '<li>Let ook op kleine, terugkerende uitgaven. Net die tellen op een jaar hard op.</li>' +
-      '<li>Begin grof. Een ruwe verdeling in 6 à 8 categorieën is genoeg om de grootste lekken te zien. Verfijnen kan later.</li></ul>' +
-      example('kleine uitgaven optellen',
-        '<p>Een man deed regelmatig kleine aankopen voor gaming. Apart leek dat onschuldig, maar opgeteld over een jaar werd het een fors bedrag. Door alles samen te tellen werd de echte jaarkost pas zichtbaar en bespreekbaar.</p>') +
+      '<ul class="check"><li>Gebruik een eenvoudige gratis budgetapp (<a class="hl-link" href="https://budgetplanner.wakosta.be/home" target="_blank" rel="noopener">Wakosta budgetplanner</a>) of een blad papier.</li>' +
+      '<li>Vul niet elke dag in, maar om de paar dagen.</li>' +
+      '<li>Let ook op kleine, terugkerende uitgaven.</li>' +
+      '<li>Begin grof. Een ruwe verdeling in 6 à 8 categorieën is genoeg om de grootste lekken te zien.</li></ul>' +
 
-      '<h2 id="s2">Stap 2 &middot; Bespaar op je maandelijkse kosten</h2>' +
+      '<h2 id="s2"><span class="step-badge">STAP 2</span> Bespaar op je maandelijkse kosten</h2>' +
       '<p>Vaste kosten lopen elke maand automatisch door, ook als je ze niet meer gebruikt. Dit is vaak het snelst te besparen, zonder dat je er elke dag mee bezig bent.</p>' +
       '<ul class="check"><li>Overloop al je abonnementen: streaming, fitness, kranten, verzekeringen. Gebruik je het nog?</li>' +
       '<li>Vergelijk energie (V-test) en telecom (Bestetarief.be) en stap over als het goedkoper kan.</li>' +
       '<li>Controleer of je recht hebt op het sociaal tarief of andere premies.</li></ul>' +
       '<div class="grid cols-3" style="margin-top:1.4rem">' +
         gcard("⚡", "Energie &amp; water", "Sociaal tarief, vergelijken en verbruik verlagen.", "energie-water.html") +
-        gcard("📱", "Telecom &amp; internet", "Goedkoper bellen en surfen.", "telecom.html") +
+        gcard("📱", TELECOM_LABEL, "Goedkoper bellen, surfen en streamen.", "telecom.html") +
         gcard("🔁", "Andere maandelijkse kosten", "Streaming, fitness, verzekeringen en goede doelen.", "abonnementen.html") +
       '</div>' +
 
-      '<h2 id="s3">Stap 3 &middot; Pak andere uitgaven aan</h2>' +
+      '<h2 id="s3"><span class="step-badge">STAP 3</span> Pak andere uitgaven aan</h2>' +
       '<p>Naast veel kleine uitgaven zijn er soms enkele grote lekken: een dure gewoonte, een lening, of een betaling waar je geen waar voor krijgt.</p>' +
       '<ul class="cross check"><li>Persoonlijke leningen voor dagelijkse uitgaven of luxe worden afgeraden.</li>' +
       '<li>Dure gewoontes (roken, dagelijks frisdrank of takeaway) kosten vaak honderden euro&#39;s per maand.</li>' +
@@ -418,13 +433,13 @@ add("aanpak.html", "Het stappenplan in 5 stappen", "aanpak.html",
         gcard("🧮", "Vele kleintjes", "Hoe kleine dagelijkse uitgaven op een jaar oplopen.", "kleine-uitgaven.html") +
       '</div>' +
 
-      '<h2 id="s4">Stap 4 &middot; Bouw een buffer van 3 tot 6 maanden</h2>' +
+      '<h2 id="s4"><span class="step-badge">STAP 4</span> Bouw een buffer van 3 tot 6 maanden</h2>' +
       '<p>Een spaarbuffer geeft rust en vangt onverwachte kosten op. Een vaak gehanteerde vuistregel: hou drie tot zes maanden vaste lasten (of inkomen) opzij. Voor een koppel is dat de som van beide inkomens, maal de gekozen aantal maanden.</p>' +
       example('een buffer opbouwen in 3 jaar',
         '<p>Een koppel rekende uit dat zes maanden samen neerkwam op € 22.000. Door dat doel te spreiden over drie jaar (36 maanden) werd het behapbaar: € 22.000 / 36 = ongeveer € 600 per maand sparen. Een groot doel werd zo een haalbare maandelijkse stap.</p>') +
       '<p><a href="sparen-buffer.html">→ Gids: sparen en je buffer opbouwen</a></p>' +
 
-      '<h2 id="s5">Stap 5 &middot; Spaar gericht voor je doelen</h2>' +
+      '<h2 id="s5"><span class="step-badge">STAP 5</span> Spaar gericht voor je doelen</h2>' +
       '<p>Heb je een concreet doel, zoals een reis of een grote aankoop? Reken terug naar een maandbedrag, en verschuif waar nodig bestaande kosten naar je doel.</p>' +
       example('sparen voor een reis',
         '<p>Een gezin wilde op reis voor € 5.000. De rekening: € 5.000 / 12 = ongeveer € 416 per maand. Door enkele ongebruikte abonnementen op te zeggen en dat geld door te schuiven naar het reisdoel, kwam de reis in beeld zonder lening.</p>') +
@@ -446,7 +461,7 @@ add("gidsen.html", "Spaargidsen", "gidsen.html",
       gcard("🧮", "Vele kleintjes", "Hoe kleine dagelijkse uitgaven op een jaar oplopen.", "kleine-uitgaven.html") +
       gcard("🔁", "Abonnementen &amp; vaste kosten", "Streaming, fitness, verzekeringen en goede doelen.", "abonnementen.html") +
       gcard("⚡", "Energie &amp; water", "Sociaal tarief, vergelijken en verbruik verlagen.", "energie-water.html") +
-      gcard("📱", "Telecom &amp; internet", "Goedkoper bellen en surfen.", "telecom.html") +
+      gcard("📱", TELECOM_LABEL, "Goedkoper bellen, surfen en streamen.", "telecom.html") +
       gcard("🏠", "Wonen", "Huurpremie, sociale lening, huren of kopen, cohousing.", "wonen.html") +
       gcard("💼", "Werk &amp; inkomen", "Je loon checken, bijverdienen, meer overhouden.", "werk-inkomen.html") +
       gcard("👨‍👩‍👧", "Gezin &amp; kinderen", "Studeren, zakgeld, kinderbijslag en toeslagen.", "gezin-kinderen.html") +
@@ -603,15 +618,120 @@ add("energie-water.html", "Besparen op energie en water", "gidsen.html",
 );
 
 /* ---------------- TELECOM ---------------- */
-add("telecom.html", "Besparen op telecom en internet", "gidsen.html",
-  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> Telecom', 'Besparen op telecom en internet',
-    'Veel mensen betalen jaar na jaar te veel voor bellen, sms&#39;en en internet, simpelweg omdat ze nooit vergelijken. Overstappen is makkelijker dan het lijkt.', 'subscriptions') +
+add("telecom.html", TELECOM_LABEL, "gidsen.html",
+  pagehead('<a href="gidsen.html">Spaargidsen</a> <span>›</span> ' + TELECOM_LABEL, TELECOM_LABEL,
+    'Veel mensen betalen jaar na jaar te veel voor bellen, sms&#39;en, internet, tv en streaming, simpelweg omdat ze nooit vergelijken of hun pakket nooit opnieuw bekijken. Overstappen of slimmer combineren is makkelijker dan het lijkt.', 'subscriptions') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Vergelijk met Bestetarief.be</h2>' +
-    '<p>Bestetarief.be is de officiële, gratis vergelijkingstool van het BIPT (de telecomwaakhond). Je geeft je gebruik in (bellen, data, internet, tv) en ziet welk tariefplan het best bij je past, bij alle operatoren.</p>' +
-    callout('tip', '💡 Tot honderden euro&#39;s per jaar', '<p>Volgens het BIPT kan je door je mobiele tariefplan te vergelijken al snel tot € 120 per jaar besparen. Voor een gezin met meerdere abonnementen loopt dat verder op.</p>') +
-    example('te veel betalen voor telecom',
-      '<p>Bij verschillende gezinnen bleek het telecomabonnement duurder dan nodig. Door over te stappen naar een goedkoper plan, vaak met evenveel data en belminuten, daalde de factuur direct.</p>') +
+    '<p><a class="hl-link" href="' + L.bestetarief.url + '" target="_blank" rel="noopener">Bestetarief.be</a> is de officiële, gratis vergelijkingstool van het BIPT (de telecomwaakhond). Je geeft je gebruik in (bellen, data, internet, tv) en ziet welk tariefplan het best bij je past, bij alle operatoren. <strong>Bestetarief vergelijkt de actuele tarieven.</strong> Volgens het BIPT kan je door je mobiele tariefplan te vergelijken <strong>al snel tot € 120 per jaar besparen</strong>, en voor een gezin met meerdere abonnementen loopt dat verder op.</p>' +
+
+    '<h2>Gsm-abonnement</h2>' +
+    '<p>Bij gsm-abonnementen is het verschil tussen de bekende, traditionele providers en de zogenaamde prijsbrekers vaak groot. Voor vergelijkbaar bel- en datagebruik betaal je bij een prijsbreker doorgaans een flink stuk minder per maand, zonder dat je veel hoeft in te leveren. <strong>Bij een overstap mag je bovendien altijd je huidig telefoonnummer gratis behouden.</strong></p>' +
+    '<div class="table-wrap">' +
+      '<table class="compare-table">' +
+        '<thead><tr><th>Traditionele providers</th><th>Prijsbrekers</th></tr></thead>' +
+        '<tbody>' +
+          '<tr>' +
+            '<td><div class="provider-list">' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_proximus.svg" alt="" loading="lazy"></span><span class="provider-name">Proximus</span></div>' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_telenet.svg" alt="" loading="lazy"></span><span class="provider-name">Telenet</span></div>' +
+            '</div></td>' +
+            '<td><div class="provider-list">' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_digi.svg" alt="" loading="lazy"></span><span class="provider-name">Digi</span></div>' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_hey.png" alt="" loading="lazy"></span><span class="provider-name">Hey Telecom</span></div>' +
+            '</div></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="price-tag price-hi">€ 20–25 <small>per maand</small></span></td>' +
+            '<td><span class="price-tag price-lo">€ 5–10 <small>per maand</small></span></td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+    disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
+
+    '<h2>Vast internet</h2>' +
+    '<p>Ook voor vast internet betaal je bij de bekende, traditionele providers vaak meer dan nodig. Een prijsbreker als Scarlet biedt een volwaardig internetabonnement voor een vaste, lagere prijs. Er bestaan nog goedkopere internetabonnementen, maar die beperken je dan wel sterk in snelheid of surfvolume.</p>' +
+    '<div class="table-wrap">' +
+      '<table class="compare-table">' +
+        '<thead><tr><th>Traditionele providers</th><th>Prijsbrekers</th></tr></thead>' +
+        '<tbody>' +
+          '<tr>' +
+            '<td><div class="provider-list">' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_proximus.svg" alt="" loading="lazy"></span><span class="provider-name">Proximus</span></div>' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_telenet.svg" alt="" loading="lazy"></span><span class="provider-name">Telenet</span></div>' +
+            '</div></td>' +
+            '<td><div class="provider-list">' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_scarlet.svg" alt="" loading="lazy"></span><span class="provider-name">Scarlet</span></div>' +
+            '</div></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="price-tag price-hi">€ 40–55 <small>per maand</small></span></td>' +
+            '<td><span class="price-tag price-lo">€ 23–34 <small>per maand</small></span>' +
+              '<button class="drawer-trigger" data-drawer="internet-nodig" aria-expanded="false" aria-controls="drawer-internet-nodig">Wat heb ik nodig?</button>' +
+            '</td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+    disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
+
+    '<h2>Tv</h2>' +
+    '<p>Klassiek tv-kijken gebeurt via een tv-decoder van je provider, met een vast bedrag per maand. Steeds meer mensen kijken echter via internet, met de gratis apps op hun (smart-)tv: VRT MAX, VTM GO en Play. Heb je geen smart-tv? Met een <a href="https://store.google.com/product/chromecast_google_tv" target="_blank" rel="noopener">Chromecast van Google</a> stream je die apps alsnog eenvoudig naar je televisie.</p>' +
+    '<div class="table-wrap">' +
+      '<table class="compare-table">' +
+        '<thead><tr><th>Via tv-decoder</th><th>Kijken via internet</th></tr></thead>' +
+        '<tbody>' +
+          '<tr>' +
+            '<td><div class="provider-list">' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_proximus.svg" alt="" loading="lazy"></span><span class="provider-name">Proximus</span></div>' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_telenet.svg" alt="" loading="lazy"></span><span class="provider-name">Telenet</span></div>' +
+            '</div></td>' +
+            '<td><div class="provider-list provider-list--apps">' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_vrt_max.png" alt="VRT MAX" loading="lazy"></span><span class="provider-name">VRT MAX</span></div>' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_vtm_go.png" alt="VTM GO" loading="lazy"></span><span class="provider-name">VTM GO</span></div>' +
+              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_play.png" alt="Play" loading="lazy"></span><span class="provider-name">Play</span></div>' +
+            '</div></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="price-tag price-hi">€ 10–15 <small>per maand</small></span></td>' +
+            '<td><span class="price-tag price-lo">Gratis</span></td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+    disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
+
+    '<h2>Streamingdiensten</h2>' +
+    '<p>De grote streamingdiensten hebben naast hun standaardabonnement (zonder reclame) bijna allemaal een goedkoper abonnement <strong>mét reclame</strong>. De inhoud blijft dezelfde, je krijgt er enkel reclame bij. Wie daarmee kan leven, bespaart al snel <strong>30 tot 50% per maand</strong> op het abonnement.</p>' +
+    '<div class="table-wrap">' +
+      '<table class="stream-table">' +
+        '<thead><tr><th>Streamingdienst</th><th>Met reclame</th><th>Zonder reclame</th><th>Je bespaart</th></tr></thead>' +
+        '<tbody>' +
+          '<tr>' +
+            '<td><span class="stream-name"><img class="stream-logo" src="assets/logos/stream_netflix_app.png" alt="" loading="lazy">Netflix</span></td>' +
+            '<td>€ 8,99</td><td>€ 16,99</td>' +
+            '<td><span class="price-tag price-lo">€ 8,00 <small>/maand &middot; 47%</small></span></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="stream-name"><img class="stream-logo" src="assets/logos/stream_disneyplus_app.png" alt="" loading="lazy">Disney+</span></td>' +
+            '<td>€ 5,99</td><td>€ 9,99</td>' +
+            '<td><span class="price-tag price-lo">€ 4,00 <small>/maand &middot; 40%</small></span></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="stream-name"><img class="stream-logo" src="assets/logos/stream_hbomax_app.png" alt="" loading="lazy">HBO Max</span></td>' +
+            '<td>€ 5,99</td><td>€ 9,99</td>' +
+            '<td><span class="price-tag price-lo">€ 4,00 <small>/maand &middot; 40%</small></span></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td><span class="stream-name"><img class="stream-logo" src="assets/logos/stream_primevideo_app.png" alt="" loading="lazy">Prime Video</span></td>' +
+            '<td>inbegrepen bij Prime</td><td>+ € 2,99 reclamevrij</td>' +
+            '<td><span class="price-tag price-lo">€ 2,99 <small>/maand &middot; toeslag</small></span></td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+    disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
 
     '<h2>Overstappen zonder gedoe</h2>' +
     '<ol class="steps">' +
@@ -625,7 +745,66 @@ add("telecom.html", "Besparen op telecom en internet", "gidsen.html",
     '<h2>Officiële bronnen</h2>' +
     linklist(['bestetarief', 'bipt', 'ombudsTelecom']) +
     disclaimer('Besparingsbedragen zijn indicaties van het BIPT; je eigen winst hangt af van je huidige abonnement en gebruik.') +
-  '</div></div></section>'
+  '</div></div></section>' +
+
+  /* Drawer: Wat heb ik nodig (vast internet) */
+  '<div class="drawer-overlay" data-drawer-overlay="internet-nodig"></div>' +
+  '<aside class="drawer" id="drawer-internet-nodig" role="dialog" aria-modal="true" aria-labelledby="drawer-internet-nodig-title" hidden>' +
+    '<div class="drawer-header">' +
+      '<h2 class="drawer-title" id="drawer-internet-nodig-title">Wat heb ik nodig?</h2>' +
+      '<button class="drawer-close" aria-label="Sluiten">' +
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>' +
+      '</button>' +
+    '</div>' +
+    '<div class="drawer-body">' +
+      '<p>De meeste gezinnen hebben <strong>veel minder snelheid nodig dan ze denken</strong>, zolang de verbinding stabiel is en het datavolume onbeperkt is.</p>' +
+
+      '<h3>Vuistregel snelheid</h3>' +
+      '<div class="drawer-speed-pills">' +
+        '<div class="speed-pill"><span class="sp-speed">50 Mbps</span><span class="sp-label">Ruim voldoende voor een klein gezin dat streamt</span></div>' +
+        '<div class="speed-pill"><span class="sp-speed">100 Mbps</span><span class="sp-label">Comfortabel voor de meeste gezinnen</span></div>' +
+        '<div class="speed-pill sp-pill-hi"><span class="sp-speed">200 Mbps+</span><span class="sp-label">Nuttig als je met veel mensen tegelijk streamt, grote bestanden downloadt of vaak games installeert</span></div>' +
+      '</div>' +
+
+      '<h3>Concrete voorbeelden</h3>' +
+      '<table class="drawer-table">' +
+        '<thead><tr><th>Activiteit</th><th>Snelheid</th><th>Data/uur</th></tr></thead>' +
+        '<tbody>' +
+          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--spotify" aria-hidden="true">♪</span>Muziek (Spotify)</span></td><td>&lt; 1 Mbps</td><td>50–150 MB</td></tr>' +
+          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--youtube" aria-hidden="true"></span>YouTube 1080p</span></td><td>± 5 Mbps</td><td>± 2–3 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--netflix" aria-hidden="true">N</span>Netflix Full HD</span></td><td><strong>5 Mbps</strong></td><td>± 3 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--netflix" aria-hidden="true">N</span>Netflix 4K</span></td><td><strong>15–25 Mbps</strong></td><td>± 7 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--video" aria-hidden="true">VC</span>Videobellen</span></td><td>2–4 Mbps</td><td>± 1 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--game" aria-hidden="true">GG</span>Online gamen</span></td><td>1–5 Mbps</td><td>&lt; 200 MB</td></tr>' +
+        '</tbody>' +
+      '</table>' +
+
+      '<h3>Wat betekent 50 Mbps in de praktijk?</h3>' +
+      '<p>Met een 50 Mbps-verbinding kan je tegelijk:</p>' +
+      '<ul>' +
+        '<li>10 Netflix-streams in Full HD</li>' +
+        '<li>2 à 3 Netflix-streams in 4K</li>' +
+        '<li>Eén 4K-film kijken terwijl iemand anders videobelt en een derde YouTube kijkt</li>' +
+      '</ul>' +
+      '<p style="font-size:.88rem;color:var(--muted)">In de praktijk wil je altijd wat marge houden voor smartphones, updates en wifi-verlies.</p>' +
+
+      '<h3>Hoeveel datavolume heb je nodig?</h3>' +
+      '<div class="drawer-section-tip">' +
+        '<strong>Onbeperkt datavolume is belangrijker dan hoge snelheid.</strong> Streaming verbruikt snel honderden GB per maand — voor vrijwel iedereen is een onbeperkt abonnement de beste keuze.' +
+      '</div>' +
+      '<p style="font-size:.88rem;color:var(--muted);margin-top:.5rem">Voorbeeld: een gezin dat elke avond 4 uur Full HD kijkt, verbruikt 4 × 30 × 3 GB = <strong>360 GB per maand</strong>.</p>' +
+
+      '<h3>Advies per situatie</h3>' +
+      '<table class="drawer-advice-table">' +
+        '<tbody>' +
+          '<tr><td>Alleenwonende</td><td>50 Mbps + onbeperkt</td></tr>' +
+          '<tr><td>Koppel</td><td>50–100 Mbps + onbeperkt</td></tr>' +
+          '<tr><td>Gezin met kinderen</td><td>100 Mbps + onbeperkt</td></tr>' +
+          '<tr><td>Groot gezin / veel 4K</td><td>200 Mbps + onbeperkt</td></tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+  '</aside>'
 );
 
 /* ---------------- WONEN ---------------- */

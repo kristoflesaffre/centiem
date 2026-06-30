@@ -1,17 +1,7 @@
-# OS
+.playwright-mcp/
+*-check.png
+drawer-*.png
+trigger-*.png
+pills-aligned.png
+telecom-trigger.png
 .DS_Store
-Thumbs.db
-
-# Node
-node_modules/
-npm-debug.log*
-package-lock.json
-
-# Editor
-.vscode/
-.idea/
-
-# Tijdelijke bestanden
-*.log
-qa/
-widget.html
