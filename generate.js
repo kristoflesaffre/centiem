@@ -171,7 +171,7 @@ function replaceEmoji(html) {
 
 /* ---------- chrome ---------- */
 function brandMark() {
-  return '<span class="mark"><img src="favicon.svg" alt="" aria-hidden="true"></span>';
+  return '<span class="mark"><img src="assets/favicon.svg" alt="" aria-hidden="true"></span>';
 }
 const TELECOM_LABEL = "gsm-abonnenement, internet en streaming";
 const NAV = [
@@ -234,7 +234,7 @@ function page(opts) {
     '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
     '<title>' + opts.title + ' &middot; Centiem</title>\n' +
     '<meta name="description" content="' + desc + '">\n' +
-    '<link rel="icon" type="image/svg+xml" href="favicon.svg">\n' +
+    '<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">\n' +
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
     '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">\n' +
     '<link rel="stylesheet" href="assets/styles.css?v=' + ASSET_VERSION + '">\n' +
@@ -374,7 +374,7 @@ function yearlySavingsWidget(id, title, intro, defaultAmount) {
   '<div class="savings-widget" data-savings-widget="' + id + '">' +
     '<button class="savings-dock" type="button" data-savings-open="' + id + '" aria-controls="savings-modal-' + id + '" aria-expanded="false">' +
       '<span class="savings-dock-icon">' + svgIcon("calculator") + '</span>' +
-      '<span class="savings-dock-copy"><span>Rekenhulp</span><strong>Bereken je jaarwinst</strong><em>maandbedrag × 12</em></span>' +
+      '<span class="savings-dock-copy"><span>Rekenhulp</span><strong>Bereken je jaarlijkse besparing</strong><em>maandbedrag × 12</em></span>' +
       '<svg class="savings-dock-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>' +
     '</button>' +
     '<div class="savings-overlay" data-savings-overlay="' + id + '" hidden></div>' +
@@ -521,6 +521,11 @@ add("kleine-uitgaven.html", "Vele kleintjes maken een groot bedrag", "gidsen.htm
     'Een koffie hier, een blikje daar: apart lijkt het niets. Maar kleine, dagelijkse uitgaven tellen op een jaar verrassend hard op. Hieronder zie je hoe, met een rekenhulp om het voor jezelf uit te rekenen.', 'guides') +
   '<section><div class="wrap"><div class="measure">' +
     '<h2>Waarom kleine bedragen zo zwaar wegen</h2>' +
+    '<picture class="content-img">' +
+      '<source media="(max-width: 640px)" srcset="assets/images/kleine-gewoonten-sm.webp" type="image/webp">' +
+      '<source srcset="assets/images/kleine-gewoonten-lg.webp" type="image/webp">' +
+      '<img src="assets/images/e7e9cfc4-2fe7-4ed5-9bab-2794e576b21e.png" alt="Kleine gewoonten. Grote impact." loading="lazy" width="1320" height="880">' +
+    '</picture>' +
     '<p>Een uitgave van een paar euro voelt onschuldig aan. Het venijn zit in de herhaling: iets wat je elke dag koopt, koop je 365 keer per jaar. Net die optelsom maakt het verschil, en is meteen ook de eenvoudigste plek om te besparen zonder dat je leven er echt anders door wordt.</p>' +
     '<p>Begin daarom met je terugkerende uitgaven samen te tellen. Pas wanneer je de jaarkost ziet, wordt zichtbaar wat een gewoonte je echt kost en kan je bewust kiezen.</p>' +
   '</div></div></section>' +
@@ -721,7 +726,8 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
     '</div>' +
     disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
 
-    '<h2>Tv</h2>' +
+    '<h2>TV, streamingsdiensten en muziek</h2>' +
+    '<h3>TV</h3>' +
     '<p>Klassiek tv-kijken gebeurt via een tv-decoder van je provider, met een vast bedrag per maand. Steeds meer mensen kijken echter via internet, met de gratis apps op hun (smart-)tv: VRT MAX, VTM GO en Play. Heb je geen smart-tv? Met een <a href="https://store.google.com/product/chromecast_google_tv" target="_blank" rel="noopener">Chromecast van Google</a> stream je die apps alsnog eenvoudig naar je televisie.</p>' +
     '<div class="table-wrap">' +
       '<table class="compare-table">' +
@@ -744,7 +750,7 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
     '</div>' +
     disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
 
-    '<h2>Streamingdiensten</h2>' +
+    '<h3>streamingsdiensten</h3>' +
     '<p>De grote streamingdiensten hebben naast hun standaardabonnement (zonder reclame) bijna allemaal een goedkoper abonnement <strong>mét reclame</strong>. De inhoud blijft dezelfde, je krijgt er enkel reclame bij. Wie daarmee kan leven, bespaart al snel <strong>30 tot 50% per maand</strong> op het abonnement.</p>' +
     '<div class="table-wrap">' +
       '<table class="stream-table">' +
@@ -775,8 +781,8 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
     '</div>' +
     disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
 
-    '<h2>Muziek streamen</h2>' +
-    '<p>Spotify is de populairste muziekdienst in België. Het <strong>gratis abonnement</strong> geeft toegang tot alle muziek, maar met reclame en zonder de vrijheid om zelf nummers te kiezen. <strong>Spotify Premium</strong> haalt die beperkingen weg — voor een stuk minder dan veel mensen denken.</p>' +
+    '<h3>muziek</h3>' +
+    '<p>Spotify Premium kost <strong>€ 10,99 per maand</strong> — dat is <strong>meer dan € 130 per jaar</strong>. Het gratis abonnement geeft toegang tot dezelfde muziek, enkel met reclame en zonder vrije afspeelvolgorde. Voor wie daar mee kan leven, is stoppen met Premium een van de makkelijkste besparingen.</p>' +
     '<div class="table-wrap">' +
       '<table class="compare-table compare-table--vcenter">' +
         '<thead><tr>' +
