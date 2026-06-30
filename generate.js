@@ -47,11 +47,16 @@ const L = {
 
 /* ---------- component helpers ---------- */
 function linklist(keys) {
+  var globe = '<svg class="ll-globe" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 2c-2.5 2.5-4 5-4 8s1.5 5.5 4 8"/><path d="M10 2c2.5 2.5 4 5 4 8s-1.5 5.5-4 8"/><line x1="2" y1="10" x2="18" y2="10"/><line x1="3" y1="6" x2="17" y2="6"/><line x1="3" y1="14" x2="17" y2="14"/></svg>';
+  var chevron = '<svg class="ll-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>';
   const items = keys.map(function (k) {
     const o = typeof k === "string" ? L[k] : k;
     const label = (typeof k === "string") ? labelFor(k) : k.label;
     return '<li><a class="ext" href="' + o.url + '" target="_blank" rel="noopener">' +
-      '<span>' + label + '</span><span class="src">' + o.src + '</span></a></li>';
+      globe +
+      '<span class="ll-title">' + label + '</span>' +
+      chevron +
+      '</a></li>';
   }).join("");
   return '<ul class="linklist">' + items + "</ul>";
 }
@@ -358,6 +363,40 @@ function calculator() {
     '</div>' +
   '</div>';
 }
+function yearlySavingsWidget(id, title, intro, defaultAmount) {
+  const amount = defaultAmount || "10";
+  const yearly = (parseFloat(String(amount).replace(",", ".")) || 0) * 12;
+  const roundedYearly = Math.round((yearly + Number.EPSILON) * 100) / 100;
+  const yearDecimals = Number.isInteger(roundedYearly) ? 0 : 2;
+  const initialYear = roundedYearly.toLocaleString("nl-BE", { minimumFractionDigits: yearDecimals, maximumFractionDigits: 2 });
+  return '' +
+  '<div class="savings-widget" data-savings-widget="' + id + '">' +
+    '<button class="savings-dock" type="button" data-savings-open="' + id + '" aria-controls="savings-modal-' + id + '" aria-expanded="false">' +
+      '<span class="savings-dock-icon">' + svgIcon("calculator") + '</span>' +
+      '<span class="savings-dock-copy"><span>Rekenhulp</span><strong>Bereken je jaarwinst</strong><em>maandbedrag × 12</em></span>' +
+    '</button>' +
+    '<div class="savings-overlay" data-savings-overlay="' + id + '" hidden></div>' +
+    '<aside class="savings-modal" id="savings-modal-' + id + '" role="dialog" aria-modal="true" aria-labelledby="savings-title-' + id + '" hidden>' +
+      '<div class="savings-modal-head">' +
+        '<p class="eyebrow">Reken het snel uit</p>' +
+        '<button class="savings-close" type="button" data-savings-close aria-label="Sluiten">' +
+          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<h2 id="savings-title-' + id + '">' + title + '</h2>' +
+      '<p class="savings-intro">' + intro + '</p>' +
+      '<label class="savings-field" for="savings-amount-' + id + '">' +
+        '<span>Besparing per maand</span>' +
+        '<span class="savings-money"><span aria-hidden="true">€</span><input id="savings-amount-' + id + '" type="text" inputmode="decimal" autocomplete="off" value="' + amount + '" data-savings-amount aria-label="Besparing per maand in euro"></span>' +
+      '</label>' +
+      '<div class="savings-result" aria-live="polite">' +
+        '<span>Besparing per jaar</span>' +
+        '<strong data-savings-year>€ ' + initialYear + '</strong>' +
+      '</div>' +
+      '<p class="savings-note">Gebruik het verschil tussen je oude en nieuwe maandbedrag. Dit is een eenvoudige schatting zonder prijsstijgingen.</p>' +
+    '</aside>' +
+  '</div>';
+}
 function heroArt() {
   return '<svg viewBox="0 0 440 360" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' +
     '<rect x="28" y="64" width="384" height="248" rx="22" fill="#ffffff" stroke="#e8ebef"/>' +
@@ -585,7 +624,8 @@ add("abonnementen.html", "Abonnementen en vaste kosten", "gidsen.html",
     '<h2>Officiële en handige bronnen</h2>' +
     linklist(['febelfin', 'consumentenombuds', 'testaankoop']) +
     disclaimer('De voorbeelden zijn illustratief. Controleer altijd je eigen contractvoorwaarden voor opzegtermijnen.') +
-  '</div></div></section>'
+  '</div></div></section>' +
+  yearlySavingsWidget('subscriptions-year', 'Wat leveren geschrapte abonnementen op?', 'Vul in hoeveel je elke maand uitspaart door een abonnement te schrappen, goedkoper te maken of te bundelen.', '15')
 );
 
 /* ---------------- ENERGIE & WATER ---------------- */
@@ -614,7 +654,8 @@ add("energie-water.html", "Besparen op energie en water", "gidsen.html",
     '<h2>Officiële bronnen</h2>' +
     linklist(['vtest', 'socialtarief', 'wonen', 'ombudsEnergie']) +
     disclaimer('Voorwaarden en bedragen van het sociaal tarief en premies wijzigen regelmatig. Controleer steeds de actuele info bij de officiële instanties.') +
-  '</div></div></section>'
+  '</div></div></section>' +
+  yearlySavingsWidget('energy-year', 'Wat bespaar je per jaar?', 'Vul in hoeveel je maandelijkse voorschot, energiefactuur of waterfactuur daalt na een overstap of besparing.', '20')
 );
 
 /* ---------------- TELECOM ---------------- */
@@ -643,7 +684,9 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
           '</tr>' +
           '<tr>' +
             '<td><span class="price-tag price-hi">€ 20–25 <small>per maand</small></span></td>' +
-            '<td><span class="price-tag price-lo">€ 5–10 <small>per maand</small></span></td>' +
+            '<td><span class="price-tag price-lo">€ 5–10 <small>per maand</small></span>' +
+              '<button class="drawer-trigger" data-drawer="gsm-3euro" aria-expanded="false" aria-controls="drawer-gsm-3euro">3 euro per maand mogelijk</button>' +
+            '</td>' +
           '</tr>' +
         '</tbody>' +
       '</table>' +
@@ -683,10 +726,7 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
         '<thead><tr><th>Via tv-decoder</th><th>Kijken via internet</th></tr></thead>' +
         '<tbody>' +
           '<tr>' +
-            '<td><div class="provider-list">' +
-              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_proximus.svg" alt="" loading="lazy"></span><span class="provider-name">Proximus</span></div>' +
-              '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_telenet.svg" alt="" loading="lazy"></span><span class="provider-name">Telenet</span></div>' +
-            '</div></td>' +
+            '<td><div class="decoder-cell"><img class="decoder-img" src="assets/logos/decoder_tv.png" alt="Tv-decoder" loading="lazy"></div></td>' +
             '<td><div class="provider-list provider-list--apps">' +
               '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_vrt_max.png" alt="VRT MAX" loading="lazy"></span><span class="provider-name">VRT MAX</span></div>' +
               '<div class="provider"><span class="provider-logo"><img src="assets/logos/logo_vtm_go.png" alt="VTM GO" loading="lazy"></span><span class="provider-name">VTM GO</span></div>' +
@@ -733,16 +773,7 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
     '</div>' +
     disclaimer('Indicatieve prijzen, situatie juni 2026. Tarieven en aanbieders wijzigen voortdurend, controleer dus altijd de actuele prijs.') +
 
-    '<h2>Overstappen zonder gedoe</h2>' +
-    '<ol class="steps">' +
-      '<li><strong>Breng je echte gebruik in kaart:</strong> hoeveel data, bellen en welke tv-zenders heb je nodig?</li>' +
-      '<li><strong>Vergelijk</strong> via Bestetarief.be en kies het best passende plan.</li>' +
-      '<li><strong>Je nummer behouden kan.</strong> De nieuwe operator regelt de overstap meestal voor jou.</li>' +
-      '<li><strong>Problemen?</strong> De Ombudsdienst voor Telecommunicatie helpt gratis.</li>' +
-    '</ol>' +
-    callout('info', '📺 Tv apart bekijken', '<p>Veel Vlaamse zenders zijn gratis online te bekijken. Ga na of je nog een dure decoder of tv-abonnement nodig hebt.</p>') +
-
-    '<h2>Officiële bronnen</h2>' +
+    '<h2>Nuttige links</h2>' +
     linklist(['bestetarief', 'bipt', 'ombudsTelecom']) +
     disclaimer('Besparingsbedragen zijn indicaties van het BIPT; je eigen winst hangt af van je huidige abonnement en gebruik.') +
   '</div></div></section>' +
@@ -770,12 +801,12 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
       '<table class="drawer-table">' +
         '<thead><tr><th>Activiteit</th><th>Snelheid</th><th>Data/uur</th></tr></thead>' +
         '<tbody>' +
-          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--spotify" aria-hidden="true">♪</span>Muziek (Spotify)</span></td><td>&lt; 1 Mbps</td><td>50–150 MB</td></tr>' +
-          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--youtube" aria-hidden="true"></span>YouTube 1080p</span></td><td>± 5 Mbps</td><td>± 2–3 GB</td></tr>' +
-          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--netflix" aria-hidden="true">N</span>Netflix Full HD</span></td><td><strong>5 Mbps</strong></td><td>± 3 GB</td></tr>' +
-          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--netflix" aria-hidden="true">N</span>Netflix 4K</span></td><td><strong>15–25 Mbps</strong></td><td>± 7 GB</td></tr>' +
-          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--video" aria-hidden="true">VC</span>Videobellen</span></td><td>2–4 Mbps</td><td>± 1 GB</td></tr>' +
-          '<tr><td><span class="activity-cell"><span class="app-badge app-badge--game" aria-hidden="true">GG</span>Online gamen</span></td><td>1–5 Mbps</td><td>&lt; 200 MB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/logo_spotify.svg" class="act-icon" alt="" loading="lazy">Muziek (Spotify)</span></td><td>&lt; 1 Mbps</td><td>50–150 MB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/logo_youtube.svg" class="act-icon act-icon--yt" alt="" loading="lazy">YouTube 1080p</span></td><td>± 5 Mbps</td><td>± 2–3 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/stream_netflix_app.png" class="act-icon" alt="" loading="lazy">Netflix Full HD</span></td><td><strong>5 Mbps</strong></td><td>± 3 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/stream_netflix_app.png" class="act-icon" alt="" loading="lazy">Netflix 4K</span></td><td><strong>15–25 Mbps</strong></td><td>± 7 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/logo_zoom.svg" class="act-icon" alt="" loading="lazy">Videobellen (Zoom)</span></td><td>2–4 Mbps</td><td>± 1 GB</td></tr>' +
+          '<tr><td><span class="activity-cell"><img src="assets/logos/logo_steam.svg" class="act-icon" alt="" loading="lazy">Online gamen (Steam)</span></td><td>1–5 Mbps</td><td>&lt; 200 MB</td></tr>' +
         '</tbody>' +
       '</table>' +
 
@@ -797,14 +828,54 @@ add("telecom.html", TELECOM_LABEL, "gidsen.html",
       '<h3>Advies per situatie</h3>' +
       '<table class="drawer-advice-table">' +
         '<tbody>' +
-          '<tr><td>Alleenwonende</td><td>50 Mbps + onbeperkt</td></tr>' +
-          '<tr><td>Koppel</td><td>50–100 Mbps + onbeperkt</td></tr>' +
-          '<tr><td>Gezin met kinderen</td><td>100 Mbps + onbeperkt</td></tr>' +
-          '<tr><td>Groot gezin / veel 4K</td><td>200 Mbps + onbeperkt</td></tr>' +
+          '<tr><td><span class="situation-cell"><img class="situation-thumb" src="assets/thumbs/advice-single.webp" alt="" loading="lazy">Alleenstaande</span></td><td>50 Mbps + onbeperkt</td></tr>' +
+          '<tr><td><span class="situation-cell"><img class="situation-thumb" src="assets/thumbs/advice-couple.webp" alt="" loading="lazy">Koppel</span></td><td>50–100 Mbps + onbeperkt</td></tr>' +
+          '<tr><td><span class="situation-cell"><img class="situation-thumb" src="assets/thumbs/advice-family.webp" alt="" loading="lazy">Gezin met kinderen</span></td><td>100 Mbps + onbeperkt</td></tr>' +
+          '<tr><td><span class="situation-cell"><img class="situation-thumb" src="assets/thumbs/advice-large-family.webp" alt="" loading="lazy">Groot gezin / veel 4K</span></td><td>200 Mbps + onbeperkt</td></tr>' +
         '</tbody>' +
       '</table>' +
     '</div>' +
-  '</aside>'
+  '</aside>' +
+  '<div class="drawer-overlay" data-drawer-overlay="gsm-3euro"></div>' +
+  '<aside class="drawer" id="drawer-gsm-3euro" role="dialog" aria-modal="true" aria-labelledby="drawer-gsm-3euro-title" hidden>' +
+    '<div class="drawer-header">' +
+      '<h2 class="drawer-title" id="drawer-gsm-3euro-title">3 euro per maand: voor wie?</h2>' +
+      '<button class="drawer-close" aria-label="Sluiten">' +
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>' +
+      '</button>' +
+    '</div>' +
+    '<div class="drawer-body">' +
+      '<p>Prijsbrekers zoals Digi bieden soms een gsm-abonnement vanaf <strong>ongeveer 3 euro per maand</strong>. Dat is heel goedkoop, maar zo&#39;n abonnement is ook <strong>zeer beperkt</strong>: je krijgt maar een paar GB mobiele data. Of dat genoeg is, hangt volledig af van hoeveel je onderweg surft.</p>' +
+      '<h3>Wanneer is dit een goede keuze?</h3>' +
+      '<ul class="check">' +
+        '<li>Je gebruikt vooral wifi (thuis, op het werk of op school) en bent zelden op mobiele data aangewezen.</li>' +
+        '<li>Je belt en sms&#39;t vooral, en kijkt onderweg weinig video.</li>' +
+        '<li>Als tweede sim, of als eerste gsm voor een kind.</li>' +
+        '<li>Voor iemand die de smartphone vooral gebruikt om te bellen en berichten te sturen.</li>' +
+      '</ul>' +
+      '<h3>Wanneer beter niet?</h3>' +
+      '<ul class="cross check">' +
+        '<li>Je scrolt onderweg veel door <strong>TikTok</strong>, Reels of YouTube Shorts.</li>' +
+        '<li>Je kijkt onderweg films of series (YouTube, Netflix).</li>' +
+        '<li>Je gebruikt vaak navigatie, of deelt je verbinding als hotspot.</li>' +
+        '<li>Je hebt thuis geen of slechte wifi en surft dus altijd via mobiele data.</li>' +
+      '</ul>' +
+      '<div class="drawer-section-tip"><strong>Sociale video verbruikt snel veel data.</strong> Een uur door TikTok scrollen kost al gauw 0,5 tot 1 GB. Met een paar GB data per maand is zo&#39;n beperkt abonnement dan na enkele avonden op.</div>' +
+      '<h3>Data-verbruik per uur</h3>' +
+      '<table class="drawer-table">' +
+        '<thead><tr><th>Activiteit</th><th>Data per uur</th></tr></thead>' +
+        '<tbody>' +
+          '<tr><td>TikTok / Reels / Shorts</td><td>± 0,5–1 GB</td></tr>' +
+          '<tr><td>YouTube / Netflix (HD)</td><td>± 1,5–3 GB</td></tr>' +
+          '<tr><td>Muziek streamen (Spotify)</td><td>± 50–150 MB</td></tr>' +
+          '<tr><td>Navigatie (Maps)</td><td>± 5–10 MB</td></tr>' +
+        '</tbody>' +
+      '</table>' +
+      '<p style="font-size:.88rem;color:var(--muted)">Reken dus eerlijk in hoeveel je écht onderweg surft. Twijfel je? Een prijsbreker met wat meer data (€ 5–10) zit nog altijd ruim onder de prijs van de traditionele providers.</p>' +
+      '<p style="margin-top:1.2rem"><a class="btn btn-ghost" href="https://www.digi-belgium.be/nl/gsm-abonnement" target="_blank" rel="noopener">Bekijk het Digi gsm-abonnement</a></p>' +
+    '</div>' +
+  '</aside>' +
+  yearlySavingsWidget('telecom-year', 'Wat bespaar je per jaar?', 'Vul het verschil in tussen je oude en nieuwe maandbedrag voor gsm, internet, tv of streaming.', '10')
 );
 
 /* ---------------- WONEN ---------------- */
